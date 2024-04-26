@@ -56,7 +56,10 @@ mutation DeletePrisoner($deviceId: String!) {
       latitude
       longitude
     }
-    
+    currentLocations {
+      latitude
+      longitude
+    }
     dateOfImprisonment
   }
 }

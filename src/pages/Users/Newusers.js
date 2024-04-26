@@ -141,14 +141,11 @@ function Newusers() {
   
       if (deletedPrisoner) {
         console.log("Prisoner deleted successfully:", deletedPrisoner);
-        // Handle successful deletion (e.g., remove prisoner from UI, show success message)
       } else {
         console.error("Prisoner deletion failed: Prisoner not found.");
-        // Handle case where prisoner with deviceId is not found
       }
     } catch (error) {
       console.error("Unexpected error deleting prisoner:", error.message);
-      // Handle unexpected errors
     }
   };
  
