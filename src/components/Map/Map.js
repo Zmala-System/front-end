@@ -1,5 +1,6 @@
 import { GoogleMap, InfoWindow, Marker } from "@react-google-maps/api";
 import { useState } from "react";
+import styling from "./stylemap.json";
 
 export const Maps = (props) => {
   const { isLoaded } = props;
@@ -55,6 +56,7 @@ export const Maps = (props) => {
           center={center}
           zoom={10}
           onLoad={(map) => setMap(map)}
+          styles={styling}  
         >
           {markers.map((marker, index) => (
             <Marker

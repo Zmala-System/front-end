@@ -6,21 +6,12 @@ export const SubscripeToTopic = gql`
   }
 `;
 
-export const GET_ALL_PROSENERS_QUERY = gql`
-  query Query {
-  getPrisoners {
-    id
-    name
-    dateOfImprisonment
-    authorizedLocations {
-      latitude
-      longitude
+export const GET_ALL_PRISONERS_QUERY = gql`
+  query GetPrisoners {
+    getPrisoners {
+      id
+      name
+      deviceId
     }
-    currentLocations {
-      latitude
-      longitude
-    }
-    deviceId
   }
-}
 `;

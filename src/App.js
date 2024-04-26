@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -11,8 +11,29 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import Login from "./pages/Login/Login";
 import Signup from "./pages/Signup/Signup";
 import Newsidebar from "./components/Sidebar/Newsidebar";
-import "@fontsource/inter";
+import { jwtDecode } from "jwt-decode";
 import Newusers from "./pages/Users/Newusers";
+
+function checkToken() {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      if (decodedToken.exp > currentTime) {
+        return true; // Indicate successful token check
+      } else {
+        localStorage.removeItem("token");
+      }
+    } catch (error) {
+      console.error("Invalid token:", error.message);
+      localStorage.removeItem("token");
+    }
+  }
+
+  return false;
+}
 
 export default function App() {
   const { isLoaded, loadError } = useJsApiLoader({
@@ -20,21 +41,41 @@ export default function App() {
     googleMapsApiKey: process.env.React_APP_GOOGLE_MAPS_API_KEY,
   });
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        const currentTime = Date.now() / 1000;
+        if (decodedToken.exp > currentTime) {
+          setIsLoggedIn(true);
+        } else {
+          localStorage.removeItem("token"); 
+          console.log("dashboard not shown");
+        }
+      } catch (error) {
+        console.error("Invalid token:", error.message);
+        localStorage.removeItem("token"); 
+      }
+    }
+  }, []);
+  const isTokenValid = checkToken();
   return (
-    <div className="font-sans">
+    <div className="">
       <Router>
         <Routes>
           <Route
             path="/login"
-            element={<Login setIsLoggedIn={setIsLoggedIn} />}
+            element={<Login />} 
           />
           <Route path="/signup" element={<Signup />} />
           <Route
             path="/*"
             element={
-              isLoggedIn ? (
+              isTokenValid ? (
                 <div className="flex flex-row">
                   <Newsidebar />
                   <main className="flex-grow">
