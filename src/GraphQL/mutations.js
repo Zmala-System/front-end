@@ -36,12 +36,20 @@ export const CREATE_PRISONER_MUTATION = gql`
 `;
 
 export const UPDATE_PRISONER_INFO_MUTATION=gql`
-  mutation UpdatePrisonerInfo($prisonerInput: PrisonerInput!) {
-    updatePrisonerInfo(prisonerInput: $prisonerInput) {
+  mutation UpdatePrisonerInfo($DeviceId: String!, $prisonerInput: PrisonerInput!) {
+    updatePrisonerInfo(DeviceId: $DeviceId, prisonerInput: $prisonerInput) {
+      id
       name
-      dateOfImprisonment
-      authorizedLocations
       deviceId
+      dateOfImprisonment
+      authorizedLocations {
+        latitude
+        longitude
+      }
+      currentLocations {
+        latitude
+        longitude
+      }
     }
   }
 `;
@@ -65,5 +73,25 @@ mutation DeletePrisoner($deviceId: String!) {
 }
 `;
 
+
+
+export const ADD_PRISONER_LOCATION_MUTATION=gql`
+mutation AddPrisonerLocation($deviceId: String!, $authorizedLocations: [[LocationInput]]) {
+  addPrisonerLocation(deviceId: $deviceId, authorizedLocations: $authorizedLocations) {
+    id
+    deviceId
+    name
+    dateOfImprisonment
+    authorizedLocations {
+      latitude
+      longitude
+    }
+    currentLocations {
+      latitude
+      longitude
+    }
+  }
+}
+`;
 
 

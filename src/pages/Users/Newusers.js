@@ -8,11 +8,13 @@ import Masonry from "react-responsive-masonry";
 import "./Users.css";
 import Adduser from "../../components/Adduser/Adduser";
 import { GET_ALL_PRISONERS_QUERY } from "../../GraphQL/queries";
-import { UPDATE_PRISONER_INFO_MUTATION,DELETE_PRISONER_MUTATION } from "../../GraphQL/mutations";
+import { UPDATE_PRISONER_INFO_MUTATION,DELETE_PRISONER_MUTATION,ADD_PRISONER_LOCATION_MUTATION } from "../../GraphQL/mutations";
 import { useLazyQuery } from "@apollo/client";
 import { useMutation } from "@apollo/client";
 import Newuserinfo from "../../Assets/Userinfo/Newuserinfo";
 import Changelocation from "../../components/Adduser/Changelocation";
+import isEmpty from 'lodash/isEmpty';
+import Addlocation from "../../components/Adduser/Addlocation";
 
 function Newusers() {
   const [getAllPrisoners, { loading, error, data }] = useLazyQuery(
@@ -30,7 +32,9 @@ function Newusers() {
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [openchange,setOpenchange]=useState(false);
+  const [openadd,setOpenadd]=useState(false);
   const [selectedPrisonerIndex, setSelectedPrisonerIndex] = useState(null);
+  const [selectedPrisoner, setSelectedPrisoner] = useState(null);
   const [name,setName]=useState("");
   const [deviceID,setDeviceID]=useState("");
   const [dateofdetention,setDateOfDetention]=useState("");
@@ -44,6 +48,15 @@ function Newusers() {
         },
       },
   );
+  const [updatePrisonerInfo] = useMutation(UPDATE_PRISONER_INFO_MUTATION,
+    {
+      context: {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        },
+    },
+    );
 
 
   const sprisoners = prisoners.filter((prisoner) =>
@@ -105,11 +118,41 @@ function Newusers() {
   const toggleEditVisible = (index) => {
     setSelectedPrisonerIndex(index === selectedPrisonerIndex ? null : index);
   };
-  const handleSaveEdit = async (index) => {
-
+  const handleSaveGeofenceData = (geofenceData) => {
+    setData(geofenceData);
+    setOpenchange(false);
   };
-  
+    const handleSaveEdit = async (deviceId) => {
+      let  authorizedLocations=[];
+      if (!isEmpty(Data)) {
+        authorizedLocations = Data.map(({ lat, lng }) => ({ latitude: lat, longitude: lng }));
+      }
 
+      try {
+          const { data: { updatePrisonerInfo: updatedPrisonerInfo } } = await updatePrisonerInfo({
+              variables: {
+                  DeviceId: deviceId,
+                  prisonerInput: {
+                      name: name,
+                      dateOfImprisonment: dateofdetention,
+                      authorizedLocations: [authorizedLocations],
+                      deviceId: deviceID,
+                  },
+              },
+          });
+          console.log(updatedPrisonerInfo);
+          if (updatedPrisonerInfo) {
+              console.log("Prisoner updated successfully:", updatedPrisonerInfo);
+              setSelectedPrisonerIndex(null);
+              window.location.reload();
+          } else {
+              console.error("Failed to update prisoner.");
+          }
+      } catch (error) {
+          console.error("Error updating prisoner:", error.message);
+      }
+};
+  
   const handleAddUserClick = () => {
     setOpen(true);
   };
@@ -125,10 +168,13 @@ function Newusers() {
     setOpenchange(false);
   }
 
-  const handleSaveGeofenceData = (geofenceData) => {
-    setData(geofenceData);
-    setOpenchange(false);
-  };
+  const handleaddloc=(prisoner)=>{
+    setOpenadd(true);
+    setSelectedPrisoner(prisoner);
+  }
+  const handlecloseadd=()=>{
+    setOpenadd(false);
+  }
 
 
   const handleDelete = async (deviceId) => {
@@ -141,6 +187,7 @@ function Newusers() {
   
       if (deletedPrisoner) {
         console.log("Prisoner deleted successfully:", deletedPrisoner);
+        window.location.reload();
       } else {
         console.error("Prisoner deletion failed: Prisoner not found.");
       }
@@ -148,6 +195,8 @@ function Newusers() {
       console.error("Unexpected error deleting prisoner:", error.message);
     }
   };
+
+
  
   return (
     <div className="rounded-lg flex flex-col p-4 users">
@@ -222,7 +271,7 @@ function Newusers() {
                   </button>
                   <button
                     style={{ backgroundColor: "#05FF00" }}
-                    onClick={handleSaveEdit}
+                    onClick={()=>handleSaveEdit(prisoner.deviceId)}
                     className="flex justify-between items-center min-w-24 text-white rounded-2xl px-3 py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl  "
                   >
                     Save
@@ -232,15 +281,19 @@ function Newusers() {
                 </div>
               )}
             </div>
-
+              <button
+                  onClick={() => handleaddloc(prisoner)}
+                  style={{ backgroundColor: "#05FF00" }}
+                  className="flex justify-between items-center text-white rounded-full px-4 py-3 font-bold shadow-2xl  transition-transform transform-gpu hover:scale-105 hover:shadow-lg "
+              >
+                add location
+              </button>
             <div className="flex justify-between pt-4 my-2">
               <button
                 variant="contained"
                 style={{ backgroundColor: "#FF0000" }}
                 className="flex justify-between items-center text-white rounded-2xl px-3 py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
-                onClick={() => {
-                  console.log(prisoner.deviceId);
-                  handleDelete(prisoner.deviceId)}}
+                onClick={() => handleDelete(prisoner.deviceId)}
               >
 
                 <CloseIcon />
@@ -268,6 +321,12 @@ function Newusers() {
         <Changelocation
           handleClose={handleclosechange}
           handleSave={handleSaveGeofenceData}
+        />
+      )}
+      {openadd &&(
+        <Addlocation
+          handleClose={handlecloseadd}
+          prisoner={selectedPrisoner}
         />
       )}
     </div>

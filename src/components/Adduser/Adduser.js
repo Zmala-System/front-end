@@ -46,6 +46,7 @@ function Adduser({ handleClose }) {
       });
   
       handleClose(); 
+      window.location.reload();
     } catch (error) {
       console.error("Error creating prisoner:", error);
     }

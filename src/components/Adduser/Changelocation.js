@@ -1,7 +1,5 @@
 import React,{useState} from 'react'
 import { useJsApiLoader } from "@react-google-maps/api";
-import CloseIcon from "@mui/icons-material/Close";
-import { Check } from "@mui/icons-material";
 import { Select } from "../Map/Select";
 
 function Changelocation({handleClose,handleSave}) {
