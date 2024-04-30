@@ -1,12 +1,10 @@
-import { GoogleMap, InfoWindow, Marker } from "@react-google-maps/api";
-import { useState } from "react";
-import styling from "./stylemap.json";
+import React from 'react';
+import { GoogleMap, Marker } from '@react-google-maps/api';
+import mapstyles from './stylemap.json';
 
 export const Maps = (props) => {
   const { isLoaded } = props;
-  const [map, setMap] = useState(null);
-  const [selectedMarker, setSelectedMarker] = useState(null);
-  const containerStyle = {
+  const mapContainerStyle = {
     width: "100%",
     height: "83vh",
   };
@@ -15,14 +13,6 @@ export const Maps = (props) => {
     lng: 1.333333,
   };
   const markers = [
-    {
-      name: "location-1",
-      status: "l7oman",
-      location: {
-        lat: 36.166667,
-        lng: 1.333333,
-      },
-    },
     {
       name: "location-2",
       status: "l7oman",
@@ -48,42 +38,29 @@ export const Maps = (props) => {
       },
     },
   ];
+
   return (
     isLoaded && (
       <>
         <GoogleMap
-          mapContainerStyle={containerStyle}
+          mapContainerStyle={mapContainerStyle}
           center={center}
           zoom={10}
-          onLoad={(map) => setMap(map)}
-          styles={styling}  
+          options={{
+            styles: mapstyles,
+          }}
         >
-          {markers.map((marker, index) => (
-            <Marker
-              key={index}
-              position={marker.location}
-              onClick={() => setSelectedMarker(marker)}
-            />
-          ))}
-          {selectedMarker && (
-            <InfoWindow
-              position={selectedMarker.location}
-              onCloseClick={() => setSelectedMarker(null)}
-            >
-              <>
-                <h1>Location: {selectedMarker.name}</h1>
-                <h1>Status: {selectedMarker.status}</h1>
-                <button
-                  onClick={() => setSelectedMarker(null)}
-                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                >
-                  Close
-                </button>
-              </>
-            </InfoWindow>
-          )}
+                {markers.map((marker, index) => (
+        <Marker
+          key={index}
+          position={marker.location}
+          title={marker.name}
+        />
+      ))}
         </GoogleMap>
       </>
     )
   );
 };
+
+export default Maps;

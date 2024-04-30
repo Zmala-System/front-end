@@ -1,5 +1,6 @@
 import { GoogleMap, DrawingManager, Polygon } from "@react-google-maps/api";
 import { useState, useRef, useEffect } from "react";
+import mapstyles from './stylemap.json';
 
 export const Select = (props) => {
   const { isLoaded } = props;
@@ -60,6 +61,9 @@ export const Select = (props) => {
           center={center}
           zoom={10}
           onLoad={(map) => setMap(map)}
+          options={{
+            styles: mapstyles,
+          }}
         >
           {geofences.map((coordinates, index) => (
             <Polygon

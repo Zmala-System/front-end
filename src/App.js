@@ -22,7 +22,7 @@ function checkToken() {
       const decodedToken = jwtDecode(token);
       const currentTime = Date.now() / 1000;
       if (decodedToken.exp > currentTime) {
-        return true; // Indicate successful token check
+        return true; 
       } else {
         localStorage.removeItem("token");
       }
@@ -36,11 +36,6 @@ function checkToken() {
 }
 
 export default function App() {
-  const { isLoaded, loadError } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: process.env.React_APP_GOOGLE_MAPS_API_KEY,
-  });
-
   const [isLoggedIn, setIsLoggedIn] = useState(false); 
 
   useEffect(() => {

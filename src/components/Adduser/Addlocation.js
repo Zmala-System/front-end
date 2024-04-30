@@ -56,6 +56,14 @@ function Addlocation({handleClose,prisoner}) {
           Save
           <Check />
         </button>
+        <button
+          style={{ backgroundColor: "#FF0000" }}
+          className="flex justify-between items-center text-white rounded-2xl px-4 py-3 font-bold shadow-2xl transition-transform transform-gpu hover:scale-105 hover:shadow-lg "
+          onClick={handleClose}
+        >
+          Cancel
+          <Check />
+        </button>
       </div>
     </div>
   </>

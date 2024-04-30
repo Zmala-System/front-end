@@ -1,8 +1,8 @@
 import React from "react";
-import { Maps } from "../../components/Map/Map";
-import { useJsApiLoader } from "@react-google-maps/api";
 import Newuserinfo from "../../Assets/Userinfo/Newuserinfo";
 import './dashboard.css';
+import { useJsApiLoader } from "@react-google-maps/api";
+import Maps from "../../components/Map/Map";
 
 
 function Dashboard() {
@@ -17,7 +17,7 @@ function Dashboard() {
         <h1 className="text-5xl">Dashboard</h1>
         <Newuserinfo/>
       </div>
-      <Maps isLoaded={isLoaded} />
+      <Maps isLoaded={isLoaded}/>
     </div>
   );
 }
