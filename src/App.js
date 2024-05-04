@@ -14,6 +14,9 @@ import Newsidebar from "./components/Sidebar/Newsidebar";
 import { jwtDecode } from "jwt-decode";
 import Newusers from "./pages/Users/Newusers";
 
+
+
+
 function checkToken() {
   const token = localStorage.getItem("token");
 
@@ -22,7 +25,7 @@ function checkToken() {
       const decodedToken = jwtDecode(token);
       const currentTime = Date.now() / 1000;
       if (decodedToken.exp > currentTime) {
-        return true; 
+        return true;
       } else {
         localStorage.removeItem("token");
       }
@@ -36,7 +39,7 @@ function checkToken() {
 }
 
 export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false); 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -48,12 +51,12 @@ export default function App() {
         if (decodedToken.exp > currentTime) {
           setIsLoggedIn(true);
         } else {
-          localStorage.removeItem("token"); 
+          localStorage.removeItem("token");
           console.log("dashboard not shown");
         }
       } catch (error) {
         console.error("Invalid token:", error.message);
-        localStorage.removeItem("token"); 
+        localStorage.removeItem("token");
       }
     }
   }, []);
@@ -64,7 +67,7 @@ export default function App() {
         <Routes>
           <Route
             path="/login"
-            element={<Login />} 
+            element={<Login />}
           />
           <Route path="/signup" element={<Signup />} />
           <Route

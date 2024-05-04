@@ -17,8 +17,10 @@ import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { SubscriptionClient } from "subscriptions-transport-ws";
 import App from './App';
+
+
 import { SubscriptionProvider } from "./Context/SubscriptionContext";
-import Test from './test';
+import SomeComponent from './SomeComponent';
 
 
 // Define the server link for both HTTP and WebSocket connections
@@ -61,19 +63,21 @@ const splitLink = split(
 const client = new ApolloClient({
   link: splitLink, // Set the link for Apollo Client
   cache: new InMemoryCache(), // Use an in-memory cache
-  headers:{
-      Authorization:localStorage.getItem("token") || ""
+  headers: {
+    Authorization: localStorage.getItem("token") || ""
   }
-  
+
 });
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
-      <App/>
+      <SubscriptionProvider>
+        <SomeComponent />
+      </SubscriptionProvider>
     </ApolloProvider>
   </React.StrictMode>
-  
+
 );
 reportWebVitals();
