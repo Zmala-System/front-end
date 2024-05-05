@@ -1,9 +1,8 @@
 import React from "react";
 import Newuserinfo from "../../Assets/Userinfo/Newuserinfo";
-import './dashboard.css';
+import "./dashboard.css";
 import { useJsApiLoader } from "@react-google-maps/api";
 import Maps from "../../components/Map/Map";
-
 
 function Dashboard() {
   const { isLoaded } = useJsApiLoader({
@@ -15,9 +14,9 @@ function Dashboard() {
     <div className="rounded-lg flex flex-col items-center justify-center p-4 dashboard">
       <div className="flex flex-row justify-between items-center w-full mb-4">
         <h1 className="text-5xl">Dashboard</h1>
-        <Newuserinfo/>
+        <Newuserinfo />
       </div>
-      <Maps isLoaded={isLoaded}/>
+      <Maps isLoaded={isLoaded} />
     </div>
   );
 }

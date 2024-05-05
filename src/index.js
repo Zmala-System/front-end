@@ -1,11 +1,7 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import reportWebVitals from './reportWebVitals';
-
-
-
-// New Imports 
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import reportWebVitals from "./reportWebVitals";
 import {
   ApolloProvider,
   ApolloClient,
@@ -16,12 +12,10 @@ import {
 import { WebSocketLink } from "@apollo/client/link/ws";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { SubscriptionClient } from "subscriptions-transport-ws";
-import App from './App';
-
+import App from "./App";
 
 import { SubscriptionProvider } from "./Context/SubscriptionContext";
-import SomeComponent from './SomeComponent';
-
+import SomeComponent from "./SomeComponent";
 
 // Define the server link for both HTTP and WebSocket connections
 const serverLink = "127.0.0.1:4000/zmala";
@@ -64,20 +58,18 @@ const client = new ApolloClient({
   link: splitLink, // Set the link for Apollo Client
   cache: new InMemoryCache(), // Use an in-memory cache
   headers: {
-    Authorization: localStorage.getItem("token") || ""
-  }
-
+    Authorization: localStorage.getItem("token") || "",
+  },
 });
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <ApolloProvider client={client}>
       <SubscriptionProvider>
-        <SomeComponent />
+        <App/>
       </SubscriptionProvider>
     </ApolloProvider>
   </React.StrictMode>
-
 );
 reportWebVitals();

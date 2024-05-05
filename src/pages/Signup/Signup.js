@@ -52,12 +52,17 @@ function Signup() {
       setEmailError("Please enter a valid email address.");
       return;
     }
-    if (!username || !email || !password || !registerAdminInput.confirmPassword) {
+    if (
+      !username ||
+      !email ||
+      !password ||
+      !registerAdminInput.confirmPassword
+    ) {
       console.error("All fields are required.");
       return;
     }
     console.log(password);
-    console.log(registerAdminInput.confirmPassword)
+    console.log(registerAdminInput.confirmPassword);
 
     try {
       // Create a copy of registerAdminInput to avoid immediate state update issue
@@ -69,7 +74,7 @@ function Signup() {
       };
       console.log(updatedRegisterAdminInput);
       setRegisterAdminInput(updatedRegisterAdminInput); // Update state after creating the copy
-  
+
       const { data } = await register();
       console.log("Signup successful:", data);
     } catch (error) {
@@ -104,7 +109,11 @@ function Signup() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            {!isEmailValid(email) && <p className="text-red-500 text-sm">Please enter a valid email address.</p>}
+            {!isEmailValid(email) && (
+              <p className="text-red-500 text-sm">
+                Please enter a valid email address.
+              </p>
+            )}
           </div>
           <div className="flex flex-col space-y-1">
             <p>Username</p>
@@ -162,7 +171,12 @@ function Signup() {
           <button
             className="bg-black text-white w-full rounded-lg p-2 transition duration-300 ease-in-out hover:bg-gray-800 transform hover:scale-105"
             onClick={handleSignup}
-            disabled={!username || !email || !password || !registerAdminInput.confirmPassword}
+            disabled={
+              !username ||
+              !email ||
+              !password ||
+              !registerAdminInput.confirmPassword
+            }
           >
             Signup
           </button>
@@ -181,18 +195,17 @@ function Signup() {
         </div>
       </div>
       <div className="w-1/2 h-screen bg-black flex justify-center items-center">
-  <div className="flex flex-col space-y-2 ">
-    <h1 className="text-white text-6xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
-      Zmala System
-    </h1>
-    <hr className="w-full border-white" />
-    <p className="text-white text-6xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
-      “The future of
-      <br /> security In Algeria”
-    </p>
-  </div>
-</div>
-
+        <div className="flex flex-col space-y-2 ">
+          <h1 className="text-white text-6xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
+            Zmala System
+          </h1>
+          <hr className="w-full border-white" />
+          <p className="text-white text-6xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
+            “The future of
+            <br /> security In Algeria”
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

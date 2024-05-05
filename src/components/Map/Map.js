@@ -1,6 +1,6 @@
-import React from 'react';
-import { GoogleMap, Marker } from '@react-google-maps/api';
-import mapstyles from './stylemap.json';
+import React from "react";
+import { GoogleMap, Marker } from "@react-google-maps/api";
+import mapstyles from "./stylemap.json";
 
 export const Maps = (props) => {
   const { isLoaded } = props;
@@ -50,13 +50,13 @@ export const Maps = (props) => {
             styles: mapstyles,
           }}
         >
-                {markers.map((marker, index) => (
-        <Marker
-          key={index}
-          position={marker.location}
-          title={marker.name}
-        />
-      ))}
+          {markers.map((marker, index) => (
+            <Marker
+              key={index}
+              position={marker.location}
+              title={marker.name}
+            />
+          ))}
         </GoogleMap>
       </>
     )

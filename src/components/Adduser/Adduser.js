@@ -5,6 +5,7 @@ import { Check } from "@mui/icons-material";
 import { Select } from "../Map/Select";
 import { CREATE_PRISONER_MUTATION } from "../../GraphQL/mutations";
 import { useMutation } from "@apollo/client";
+import "./Adduser.css"; // Import the CSS file for styling
 
 function Adduser({ handleClose }) {
   const { isLoaded } = useJsApiLoader({
@@ -17,12 +18,12 @@ function Adduser({ handleClose }) {
   const [BraceletId, setBraceletId] = useState("");
   const [DateOfDetention, setDateOfDetention] = useState("");
   const [PeriodOfDetention, setPeriodOfDetention] = useState("");
-  const [createPrisoner] = useMutation(CREATE_PRISONER_MUTATION, 
-    {
+  const [datafilled, setDatafilled] = useState(false);
+  const [createPrisoner] = useMutation(CREATE_PRISONER_MUTATION, {
     context: {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     },
   });
 
@@ -32,26 +33,33 @@ function Adduser({ handleClose }) {
   };
 
   const handleSave = async () => {
-    try {
-      const authorizedLocations = Data.map(({ lat, lng }) => ({ latitude: lat, longitude: lng }));
-      await createPrisoner({
-        variables: {
-          prisonerInput: {
-            name: Name,
-            dateOfImprisonment: DateOfDetention,
-            authorizedLocations: [authorizedLocations],
-            deviceId: BraceletId,
+    if ((Data == "") || (Name=="") || (DateOfBirth=="") || (DateOfDetention=="") || (PeriodOfDetention=="")) {
+      setDatafilled(true);
+    } else {
+      setDatafilled(false);
+      try {
+        const authorizedLocations = Data.map(({ lat, lng }) => ({
+          latitude: lat,
+          longitude: lng,
+        }));
+        await createPrisoner({
+          variables: {
+            prisonerInput: {
+              name: Name,
+              dateOfImprisonment: DateOfDetention,
+              authorizedLocations: [authorizedLocations],
+              deviceId: BraceletId,
+            },
           },
-        },
-      });
-  
-      handleClose(); 
-      window.location.reload();
-    } catch (error) {
-      console.error("Error creating prisoner:", error);
+        });
+
+        handleClose();
+        window.location.reload();
+      } catch (error) {
+        console.error("Error creating prisoner:", error);
+      }
     }
   };
-  
 
   return (
     <>
@@ -96,7 +104,13 @@ function Adduser({ handleClose }) {
             />
           </div>
           <div className="flex flex-col items-end px-4">
-            <Select isLoaded={isLoaded} onGeofenceEvent={handleGeofenceUpdate} />
+            <Select
+              isLoaded={isLoaded}
+              onGeofenceEvent={handleGeofenceUpdate}
+            />
+            {datafilled && (
+              <p className="error-message">Please fill all fields</p>
+            )}
             <div className="flex my-4">
               <button
                 variant="contained"
@@ -124,5 +138,3 @@ function Adduser({ handleClose }) {
 }
 
 export default Adduser;
-
-

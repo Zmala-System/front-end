@@ -4,26 +4,33 @@ import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import { Check } from "@mui/icons-material";
-import { Add as AddIcon } from '@material-ui/icons';
-import Masonry from "react-responsive-masonry";
+import { Add as AddIcon } from "@material-ui/icons";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import "./Users.css";
 import Adduser from "../../components/Adduser/Adduser";
 import { GET_ALL_PRISONERS_QUERY } from "../../GraphQL/queries";
-import { UPDATE_PRISONER_INFO_MUTATION, DELETE_PRISONER_MUTATION, ADD_PRISONER_LOCATION_MUTATION } from "../../GraphQL/mutations";
+import {
+  UPDATE_PRISONER_INFO_MUTATION,
+  DELETE_PRISONER_MUTATION,
+  ADD_PRISONER_LOCATION_MUTATION,
+} from "../../GraphQL/mutations";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import Newuserinfo from "../../Assets/Userinfo/Newuserinfo";
 import Changelocation from "../../components/Adduser/Changelocation";
-import isEmpty from 'lodash/isEmpty';
+import isEmpty from "lodash/isEmpty";
 import Addlocation from "../../components/Adduser/Addlocation";
 
 function Newusers() {
-  const [getAllPrisoners, { loading, error, data }] = useLazyQuery(GET_ALL_PRISONERS_QUERY, {
-    context: {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    },
-  });
+  const [getAllPrisoners, { loading, error, data }] = useLazyQuery(
+    GET_ALL_PRISONERS_QUERY,
+    {
+      context: {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      },
+    }
+  );
   const [Data, setData] = useState();
   const [prisoners, setPrisoners] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,18 +42,19 @@ function Newusers() {
   const [name, setName] = useState("");
   const [deviceID, setDeviceID] = useState("");
   const [dateofdetention, setDateOfDetention] = useState("");
-  const [deletePrisoner, { loading: deleteLoading, error: deleteError }] = useMutation(DELETE_PRISONER_MUTATION, {
-    context: {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
-    },
-  });
+  const [deletePrisoner, { loading: deleteLoading, error: deleteError }] =
+    useMutation(DELETE_PRISONER_MUTATION, {
+      context: {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      },
+    });
   const [updatePrisonerInfo] = useMutation(UPDATE_PRISONER_INFO_MUTATION, {
     context: {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
-      }
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
     },
   });
 
@@ -126,11 +134,16 @@ function Newusers() {
   const handleSaveEdit = async (deviceId) => {
     let authorizedLocations = [];
     if (!isEmpty(Data)) {
-      authorizedLocations = Data.map(({ lat, lng }) => ({ latitude: lat, longitude: lng }));
+      authorizedLocations = Data.map(({ lat, lng }) => ({
+        latitude: lat,
+        longitude: lng,
+      }));
     }
 
     try {
-      const { data: { updatePrisonerInfo: updatedPrisonerInfo } } = await updatePrisonerInfo({
+      const {
+        data: { updatePrisonerInfo: updatedPrisonerInfo },
+      } = await updatePrisonerInfo({
         variables: {
           DeviceId: deviceId,
           prisonerInput: {
@@ -211,109 +224,111 @@ function Newusers() {
           />
           <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-6 w-6" />
         </div>
-        <Newuserinfo showAddFriendIcon={true} handleadduserclick={handleAddUserClick} />
-      </div>
-      <Masonry
-        columnsCount={4}
-        className="grid grid-cols-3 mt-4 p-6 grid-container"
-        style={{ maxHeight: "calc(100vh - 180px)", overflowY: "auto" }}
-        gutter="40px"
-      >
-        {sprisoners.map((prisoner, index) => (
-          <div
-            key={index}
-            className={`flex flex-col p-6 rounded-2xl bg-white shadow-xl ${
-              selectedPrisonerIndex === index ? "bg-blue-200" : ""
-            }`}
-            style={{
-              boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
-            }}
-          >
-            <p className="py-2">
-              <span className="font-semibold text-xl">Name: </span>
-              <span className="text-xl">{prisoner.name}</span>
-            </p>
-            <p>
-              <span className="font-semibold text-xl">DeviceID: </span>
-              <span className="text-xl">{prisoner.deviceId}</span>
-            </p>
-            <div>
-              {selectedPrisonerIndex === index && (
-                <div className="space-y-4 flex flex-col justify-center items-center w-full">
-                  <hr className="mt-4 w-full h-2" />
-                  <input
-                    placeholder="Name"
-                    className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                    style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                  <input
-                    placeholder="Device ID"
-                    className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                    style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
-                    onChange={(e) => setDeviceID(e.target.value)}
-                  />
-                  <input
-                    placeholder="Date of Detention"
-                    className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                    style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
-                    onChange={(e) => setDateOfDetention(e.target.value)}
-                  />
-                  <button
-                    style={{ backgroundColor: "#05FF00" }}
-                    onClick={handlechngelocation}
-                    className="flex justify-between items-center min-w-24 text-white rounded-2xl px-3 py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl  "
-                  >
-                    Change Authorized location
-                    <Check />
-                  </button>
-                  <button
-                    style={{ backgroundColor: "#05FF00" }}
-                    onClick={() => handleSaveEdit(prisoner.deviceId)}
-                    className="flex justify-between items-center min-w-24 text-white rounded-2xl px-3 py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl  "
-                  >
-                    Save
-                    <Check />
-                  </button>
-                  <hr className="mt-4 w-full h-2" />
-                </div>
-              )}
-            </div>
-            <div className="flex justify-between pt-4 my-2">
-              <button
-                variant="contained"
-                style={{ backgroundColor: "#FF0000" }}
-                className="flex justify-between items-center text-white rounded-2xl px-3 py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
-                onClick={() => handleDelete(prisoner.deviceId)}
-              >
-                <CloseIcon />
-              </button>
-              <button
-                onClick={() => handleaddloc(prisoner)}
-                style={{ backgroundColor: "#05FF00" }}
-                className="flex justify-between items-center text-white rounded-2xl px-4 py-3 font-bold shadow-2xl  transition-transform transform-gpu hover:scale-105 hover:shadow-lg "
-              >
-                add location
-                <AddIcon />
-              </button>
-              <button
-                variant="contained"
-                style={{ backgroundColor: "#4A3AFF" }}
-                className="flex justify-between items-center text-white rounded-2xl px-2 py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
-                onClick={() => toggleEditVisible(index)}
-                disabled={selectedPrisonerIndex === index}
-              >
-                <EditIcon />
-              </button>
-            </div>
-          </div>
-        ))}
-      </Masonry>
-      {open && (
-        <Adduser
-          handleClose={handleClose}
+        <Newuserinfo
+          showAddFriendIcon={true}
+          handleadduserclick={handleAddUserClick}
         />
-      )}
+      </div>
+      <ResponsiveMasonry
+        columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3, 1300: 4 }}
+      >
+        <Masonry
+          className="grid grid-cols-3 mt-4 p-6 grid-container"
+          style={{ maxHeight: "calc(100vh - 180px)", overflowY: "auto" }}
+          gutter="40px"
+        >
+          {sprisoners.map((prisoner, index) => (
+            <div
+              key={index}
+              className={`flex flex-col p-6 rounded-2xl bg-white shadow-xl ${
+                selectedPrisonerIndex === index ? "bg-blue-200" : ""
+              }`}
+              style={{
+                boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
+              }}
+            >
+              <p className="py-2">
+                <span className="font-semibold text-xl">Name: </span>
+                <span className="text-xl">{prisoner.name}</span>
+              </p>
+              <p>
+                <span className="font-semibold text-xl">DeviceID: </span>
+                <span className="text-xl">{prisoner.deviceId}</span>
+              </p>
+              <div>
+                {selectedPrisonerIndex === index && (
+                  <div className="space-y-4 flex flex-col justify-center items-center w-full">
+                    <hr className="mt-4 w-full h-2" />
+                    <input
+                      placeholder="Name"
+                      className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                      style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                    <input
+                      placeholder="Device ID"
+                      className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                      style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                      onChange={(e) => setDeviceID(e.target.value)}
+                    />
+                    <input
+                      placeholder="Date of Detention"
+                      className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                      style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                      onChange={(e) => setDateOfDetention(e.target.value)}
+                    />
+                    <button
+                      style={{ backgroundColor: "#05FF00" }}
+                      onClick={handlechngelocation}
+                      className="flex justify-between items-center min-w-24 text-white rounded-2xl px-3 py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl  "
+                    >
+                      Change Authorized location
+                      <Check />
+                    </button>
+                    <button
+                      style={{ backgroundColor: "#05FF00" }}
+                      onClick={() => handleSaveEdit(prisoner.deviceId)}
+                      className="flex justify-between items-center min-w-24 text-white rounded-2xl px-3 py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl  "
+                    >
+                      Save
+                      <Check />
+                    </button>
+                    <hr className="mt-4 w-full h-2" />
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col lg:flex-row space-y-2 justify-between pt-4 my-2">
+                <button
+                  variant="contained"
+                  style={{ backgroundColor: "#FF0000" }}
+                  className="flex justify-between items-center text-white rounded-2xl px-2 py-1 md:px-3 md:py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                  onClick={() => handleDelete(prisoner.deviceId)}
+                >
+                  <CloseIcon />
+                </button>
+                <button
+                  onClick={() => handleaddloc(prisoner)}
+                  style={{ backgroundColor: "#05FF00" }}
+                  className="flex justify-between items-center text-white rounded-2xl px-2 py-1 md:px-3 md:py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                >
+                  add location
+                  <AddIcon />
+                </button>
+                <button
+                  variant="contained"
+                  style={{ backgroundColor: "#4A3AFF" }}
+                  className="flex justify-between items-center text-white rounded-2xl px-2 py-1 md:px-3 md:py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                  onClick={() => toggleEditVisible(index)}
+                  disabled={selectedPrisonerIndex === index}
+                >
+                  <EditIcon />
+                </button>
+              </div>
+            </div>
+          ))}
+        </Masonry>
+      </ResponsiveMasonry>
+      {open && <Adduser handleClose={handleClose} />}
       {openchange && (
         <Changelocation
           handleClose={handleclosechange}
@@ -321,10 +336,7 @@ function Newusers() {
         />
       )}
       {openadd && (
-        <Addlocation
-          handleClose={handlecloseadd}
-          prisoner={selectedPrisoner}
-        />
+        <Addlocation handleClose={handlecloseadd} prisoner={selectedPrisoner} />
       )}
     </div>
   );

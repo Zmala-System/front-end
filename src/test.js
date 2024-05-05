@@ -6,8 +6,10 @@ function Test() {
   const [getAllPrisoners, { loading, error, data }] = useLazyQuery(
     GET_ALL_PRISONERS_QUERY,
     {
-      context: { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } },
-    },
+      context: {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      },
+    }
   );
   const [prisoners, setPrisoners] = useState([]); // State to store fetched prisoners
 

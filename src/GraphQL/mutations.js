@@ -35,8 +35,11 @@ export const CREATE_PRISONER_MUTATION = gql`
   }
 `;
 
-export const UPDATE_PRISONER_INFO_MUTATION=gql`
-  mutation UpdatePrisonerInfo($DeviceId: String!, $prisonerInput: PrisonerInput!) {
+export const UPDATE_PRISONER_INFO_MUTATION = gql`
+  mutation UpdatePrisonerInfo(
+    $DeviceId: String!
+    $prisonerInput: PrisonerInput!
+  ) {
     updatePrisonerInfo(DeviceId: $DeviceId, prisonerInput: $prisonerInput) {
       id
       name
@@ -54,44 +57,61 @@ export const UPDATE_PRISONER_INFO_MUTATION=gql`
   }
 `;
 
-export const DELETE_PRISONER_MUTATION=gql`
-mutation DeletePrisoner($deviceId: String!) {
-  deletePrisoner(deviceId: $deviceId) {
-    id
-    deviceId
-    name
-    authorizedLocations {
-      latitude
-      longitude
-    }
-    currentLocations {
-      latitude
-      longitude
-    }
-    dateOfImprisonment
-  }
-}
-`;
-
-
-
-export const ADD_PRISONER_LOCATION_MUTATION=gql`
-mutation AddPrisonerLocation($deviceId: String!, $authorizedLocations: [[LocationInput]]) {
-  addPrisonerLocation(deviceId: $deviceId, authorizedLocations: $authorizedLocations) {
-    id
-    deviceId
-    name
-    dateOfImprisonment
-    authorizedLocations {
-      latitude
-      longitude
-    }
-    currentLocations {
-      latitude
-      longitude
+export const DELETE_PRISONER_MUTATION = gql`
+  mutation DeletePrisoner($deviceId: String!) {
+    deletePrisoner(deviceId: $deviceId) {
+      id
+      deviceId
+      name
+      authorizedLocations {
+        latitude
+        longitude
+      }
+      currentLocations {
+        latitude
+        longitude
+      }
+      dateOfImprisonment
     }
   }
-}
 `;
 
+export const ADD_PRISONER_LOCATION_MUTATION = gql`
+  mutation AddPrisonerLocation(
+    $deviceId: String!
+    $authorizedLocations: [[LocationInput]]
+  ) {
+    addPrisonerLocation(
+      deviceId: $deviceId
+      authorizedLocations: $authorizedLocations
+    ) {
+      id
+      deviceId
+      name
+      dateOfImprisonment
+      authorizedLocations {
+        latitude
+        longitude
+      }
+      currentLocations {
+        latitude
+        longitude
+      }
+    }
+  }
+`;
 
+export const CHANGE_ADMIN_PASSWORD = gql`
+  mutation ChangeAdminPassword($password: String!, $confirmPassword: String!) {
+    changeAdminPassword(
+      password: $password
+      confirmPassword: $confirmPassword
+    ) {
+      id
+      email
+      username
+      password
+      token
+    }
+  }
+`;

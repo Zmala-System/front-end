@@ -73,18 +73,18 @@ function Login() {
 
   return (
     <div className="w-full flex flex-row items-center relative login">
-<div className="w-1/2 h-screen bg-black flex justify-center items-center">
-  <div className="flex flex-col space-y-2 ">
-    <h1 className="text-white text-6xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
-      Zmala System
-    </h1>
-    <hr className="w-full border-white" />
-    <p className="text-white text-6xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
-      “The future of
-      <br /> security In Algeria”
-    </p>
-  </div>
-</div>
+      <div className="w-1/2 h-screen bg-black flex justify-center items-center">
+        <div className="flex flex-col space-y-2 ">
+          <h1 className="text-white text-6xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
+            Zmala System
+          </h1>
+          <hr className="w-full border-white" />
+          <p className="text-white text-6xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl">
+            “The future of
+            <br /> security In Algeria”
+          </p>
+        </div>
+      </div>
 
       <div className="flex relative justify-center items-center h-screen">
         <div className=" absolute text-gradient text-9xl font-bold -rotate-90 tracking-widest">
@@ -123,7 +123,7 @@ function Login() {
             </div>
           </div>
           {loginError && <p className="text-red-500 text-sm">{loginError}</p>}
-            <p className="text-center text-gray-500">Forgot Password?</p>
+          <p className="text-center text-gray-500">Forgot Password?</p>
           <button
             className="bg-black text-white w-full rounded-lg p-2 transition duration-300 ease-in-out hover:bg-gray-800 transform hover:scale-105"
             onClick={handleLogin}

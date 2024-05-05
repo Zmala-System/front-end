@@ -1,16 +1,16 @@
-.user{
-    display: grid;
-    transition: grid-template-rows 0.5s ease;
+.user {
+  display: grid;
+  transition: grid-template-rows 0.5s ease;
 }
 
 .user > div {
-    overflow: hidden;   
+  overflow: hidden;
 }
 
-.down{
-    grid-template-rows: 0fr;
+.down {
+  grid-template-rows: 0fr;
 }
 
-.up{
-    grid-template-rows: 1fr;
+.up {
+  grid-template-rows: 1fr;
 }

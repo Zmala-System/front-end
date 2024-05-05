@@ -14,9 +14,6 @@ import Newsidebar from "./components/Sidebar/Newsidebar";
 import { jwtDecode } from "jwt-decode";
 import Newusers from "./pages/Users/Newusers";
 
-
-
-
 function checkToken() {
   const token = localStorage.getItem("token");
 
@@ -65,10 +62,7 @@ export default function App() {
     <div className="">
       <Router>
         <Routes>
-          <Route
-            path="/login"
-            element={<Login />}
-          />
+          <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route
             path="/*"

@@ -18,11 +18,13 @@ export const SubscriptionProvider = ({ children }) => {
   // Use the useSubscription hook from Apollo Client to subscribe to a topic [ex subscribe using use id]
   const { data, loading, error } = useSubscription(SubscripeToTopic, {
     variables: { topicName: "newIncomingData" }, // Subscription variables
-    onData: (options) => { // Callback function for incoming data 
+    onData: (options) => {
+      // Callback function for incoming data
       const { data } = options;
       setIncomingData(data); // Update incomingData state with new data
     },
-    onError: (err) => { // Callback function for subscription errors
+    onError: (err) => {
+      // Callback function for subscription errors
       console.log(err); // Log the error to the console
     },
   });
