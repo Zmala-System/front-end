@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "reactjs-popup/dist/index.css";
 import SearchIcon from "@mui/icons-material/Search";
-import CloseIcon from "@mui/icons-material/Close";
-import EditIcon from "@mui/icons-material/Edit";
-import { Check } from "@mui/icons-material";
-import { Add as AddIcon } from "@material-ui/icons";
-import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
+import { useJsApiLoader } from "@react-google-maps/api";
 import "./Users.css";
 import Adduser from "../../components/Adduser/Adduser";
 import { GET_ALL_PRISONERS_QUERY } from "../../GraphQL/queries";
@@ -16,9 +12,10 @@ import {
 } from "../../GraphQL/mutations";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import Newuserinfo from "../../Assets/Userinfo/Newuserinfo";
-import Changelocation from "../../components/Adduser/Changelocation";
 import isEmpty from "lodash/isEmpty";
-import Addlocation from "../../components/Adduser/Addlocation";
+import Popup from "reactjs-popup";
+import { Select } from "../../components/Map/Select";
+import { GeofenceShow } from "../../components/Map/geofence";
 
 function Newusers() {
   const [getAllPrisoners, { loading, error, data }] = useLazyQuery(
@@ -31,14 +28,22 @@ function Newusers() {
       },
     }
   );
+  const [addPrisonerLocation] = useMutation(ADD_PRISONER_LOCATION_MUTATION, {
+    context: {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    },
+  });
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.React_APP_GOOGLE_MAPS_API_KEY,
+  });
   const [Data, setData] = useState();
   const [prisoners, setPrisoners] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
-  const [openchange, setOpenchange] = useState(false);
-  const [openadd, setOpenadd] = useState(false);
   const [selectedPrisonerIndex, setSelectedPrisonerIndex] = useState(null);
-  const [selectedPrisoner, setSelectedPrisoner] = useState(null);
   const [name, setName] = useState("");
   const [deviceID, setDeviceID] = useState("");
   const [dateofdetention, setDateOfDetention] = useState("");
@@ -96,7 +101,7 @@ function Newusers() {
         </div>
         Loading prisoners...
       </div>
-    ); // Display loading message
+    );
   }
 
   if (error) {
@@ -122,15 +127,33 @@ function Newusers() {
     );
   }
 
-  const toggleEditVisible = (index) => {
-    setSelectedPrisonerIndex(index === selectedPrisonerIndex ? null : index);
+  const handleaddlocation = async (deviceID, authorizedLocations) => {
+    let authorizedLocationn = [];
+    if (!isEmpty(Data)) {
+      authorizedLocationn = Data.map(({ lat, lng }) => ({
+        latitude: lat,
+        longitude: lng,
+      }));
+    }
+    console.log("auth:", authorizedLocationn);
+    try {
+      const { data } = await addPrisonerLocation({
+        variables: {
+          deviceId: deviceID,
+          authorizedLocations: [authorizedLocationn],
+        },
+      });
+      console.log("Location added successfully:", data.addPrisonerLocation);
+    } catch (error) {
+      console.error("Failed to add location:", error.message);
+    }
+    handleClose();
   };
-
-  const handleSaveGeofenceData = (geofenceData) => {
+  const handleGeofenceUpdate = (eventType, geofenceData) => {
     setData(geofenceData);
-    setOpenchange(false);
+    console.log(geofenceData);
+    console.log("Geofence update:", eventType, geofenceData);
   };
-
   const handleSaveEdit = async (deviceId) => {
     let authorizedLocations = [];
     if (!isEmpty(Data)) {
@@ -175,23 +198,6 @@ function Newusers() {
     setOpen(false);
   };
 
-  const handlechngelocation = () => {
-    setOpenchange(true);
-  };
-
-  const handleclosechange = () => {
-    setOpenchange(false);
-  };
-
-  const handleaddloc = (prisoner) => {
-    setOpenadd(true);
-    setSelectedPrisoner(prisoner);
-  };
-
-  const handlecloseadd = () => {
-    setOpenadd(false);
-  };
-
   const handleDelete = async (deviceId) => {
     if (deleteError) {
       console.log("error", typeof deleteError);
@@ -210,7 +216,7 @@ function Newusers() {
   };
 
   return (
-    <div className="rounded-lg flex flex-col p-4 users">
+    <div className="rounded-lg flex flex-col p-4 users ">
       <div className="flex flex-row justify-between items-center">
         <h1 className="text-5xl">Prisoners</h1>
         <div className="relative">
@@ -229,115 +235,286 @@ function Newusers() {
           handleadduserclick={handleAddUserClick}
         />
       </div>
-      <ResponsiveMasonry
-        columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3, 1300: 4 }}
-      >
-        <Masonry
-          className="grid grid-cols-3 mt-4 p-6 grid-container"
-          style={{ maxHeight: "calc(100vh - 180px)", overflowY: "auto" }}
-          gutter="40px"
-        >
-          {sprisoners.map((prisoner, index) => (
-            <div
-              key={index}
-              className={`flex flex-col p-6 rounded-2xl bg-white shadow-xl ${
-                selectedPrisonerIndex === index ? "bg-blue-200" : ""
-              }`}
-              style={{
-                boxShadow: "0 0 10px rgba(0, 0, 0, 0.2)",
-              }}
-            >
-              <p className="py-2">
-                <span className="font-semibold text-xl">Name: </span>
-                <span className="text-xl">{prisoner.name}</span>
-              </p>
-              <p>
-                <span className="font-semibold text-xl">DeviceID: </span>
-                <span className="text-xl">{prisoner.deviceId}</span>
-              </p>
-              <div>
-                {selectedPrisonerIndex === index && (
-                  <div className="space-y-4 flex flex-col justify-center items-center w-full">
-                    <hr className="mt-4 w-full h-2" />
-                    <input
-                      placeholder="Name"
-                      className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                      style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
-                      onChange={(e) => setName(e.target.value)}
-                    />
-                    <input
-                      placeholder="Device ID"
-                      className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                      style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
-                      onChange={(e) => setDeviceID(e.target.value)}
-                    />
-                    <input
-                      placeholder="Date of Detention"
-                      className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                      style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
-                      onChange={(e) => setDateOfDetention(e.target.value)}
-                    />
-                    <button
-                      style={{ backgroundColor: "#05FF00" }}
-                      onClick={handlechngelocation}
-                      className="flex justify-between items-center min-w-24 text-white rounded-2xl px-3 py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl  "
-                    >
-                      Change Authorized location
-                      <Check />
-                    </button>
-                    <button
-                      style={{ backgroundColor: "#05FF00" }}
-                      onClick={() => handleSaveEdit(prisoner.deviceId)}
-                      className="flex justify-between items-center min-w-24 text-white rounded-2xl px-3 py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl  "
-                    >
-                      Save
-                      <Check />
-                    </button>
-                    <hr className="mt-4 w-full h-2" />
+      <div className="flex flex-col m-2 p-2">
+        <table className="table">
+          <thead>
+            <tr>
+              <th className="p-2">Index</th>
+              <th className="p-2">Name</th>
+              <th className="p-2">DeviceID</th>
+              <th></th>
+              <th></th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {sprisoners.map((prisoner, index) => (
+              <Popup
+                trigger={
+                  <tr
+                    key={prisoner.deviceId}
+                    className="hover:bg-[#e7e7e7] cursor-pointer rounded-full spacey2"
+                  >
+                    <td className="text-lg p-2">{index + 1}</td>
+                    <td className="text-lg p-2">
+                      <p className="text-lg  p-2 cursor-pointer">
+                        {prisoner.name}
+                      </p>
+                    </td>
+                    <td className="text-lg p-2">{prisoner.deviceId}</td>
+                    <td>
+                      <Popup
+                        trigger={
+                          <button
+                            variant="contained"
+                            style={{ backgroundColor: "#FF0000" }}
+                            className="flex m-2 justify-between items-center text-white rounded-2xl px-1 py-1 md:px-3 md:py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                          >
+                            Add New Authorized Location
+                          </button>
+                        }
+                        modal
+                        contentStyle={{
+                          borderRadius: "8px",
+                          padding: "10px",
+                          width: "500px",
+                        }}
+                      >
+                        {(close) => (
+                          <div className="flex flex-col items-center w-full space-y-4">
+                            <div className="text-center border-b-2 border-b-black font-bold text-lg p-2 w-full">
+                              Add Location
+                            </div>
+                            <div className="text-center text-lg p-2 w-full">
+                              <Select
+                                isLoaded={isLoaded}
+                                onGeofenceEvent={handleGeofenceUpdate}
+                              />
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                variant="contained"
+                                style={{ backgroundColor: "#FF0000" }}
+                                className="flex justify-between items-center text-white rounded-xl p-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                                onClick={() => {
+                                  close();
+                                }}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                variant="contained"
+                                style={{ backgroundColor: "#FF0000" }}
+                                className="flex justify-between items-center text-white rounded-xl p-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                                onClick={() => {
+                                  console.log("Prisoner Deleted ");
+                                  handleaddlocation(
+                                    prisoner.deviceId,
+                                    prisoner.authorizedLocations
+                                  );
+                                  close();
+                                }}
+                              >
+                                Confirm
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Popup>
+                    </td>
+                    <td>
+                      <Popup
+                        trigger={
+                          <button
+                            variant="contained"
+                            style={{ backgroundColor: "#FF0000" }}
+                            className="flex m-2 justify-between items-center text-white rounded-2xl px-1 py-1 md:px-3 md:py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                          >
+                            Delete
+                          </button>
+                        }
+                        className=""
+                        modal
+                        contentStyle={{
+                          borderRadius: "8px",
+                          padding: "10px",
+                          width: "500px",
+                        }}
+                      >
+                        {(close) => (
+                          <div className="flex flex-col items-center w-full space-y-4">
+                            <div className="text-center border-b-2 border-b-black font-bold text-lg p-2 w-full">
+                              Delete Confirmation
+                            </div>
+                            <div className="text-center text-lg p-2 w-full">
+                              Do you Really want to delete the prisoner?
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                variant="contained"
+                                style={{ backgroundColor: "#FF0000" }}
+                                className="flex justify-between items-center text-white rounded-xl p-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                                onClick={() => {
+                                  close();
+                                }}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                variant="contained"
+                                style={{ backgroundColor: "#FF0000" }}
+                                className="flex justify-between items-center text-white rounded-xl p-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                                onClick={() => {
+                                  console.log("Prisoner Deleted ");
+                                  handleDelete(prisoner.deviceId);
+                                  close();
+                                }}
+                              >
+                                Confirm
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Popup>
+                    </td>
+                    <td>
+                      <Popup
+                        trigger={
+                          <button
+                            variant="contained"
+                            style={{ backgroundColor: "#FF0000" }}
+                            className="flex m-2 justify-between items-center text-white rounded-2xl px-1 py-1 md:px-3 md:py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                          >
+                            Edit
+                          </button>
+                        }
+                        className=""
+                        modal
+                        contentStyle={{
+                          borderRadius: "8px",
+                          padding: "10px",
+                          width: "500px",
+                        }}
+                      >
+                        {(close) => (
+                          <div className="flex flex-col items-center w-full space-y-4">
+                            <div className="text-center border-b-2 border-b-black font-bold text-lg p-2 w-full">
+                              Edit Prisoner
+                            </div>
+                            <div className="text-center text-lg p-2 w-full">
+                              <input
+                                placeholder="Name"
+                                className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                                style={{
+                                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)",
+                                }}
+                                onChange={(e) => setName(e.target.value)}
+                              />
+                              <input
+                                placeholder="Device ID"
+                                className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                                style={{
+                                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)",
+                                }}
+                                onChange={(e) => setDeviceID(e.target.value)}
+                              />
+                              <input
+                                placeholder="Date of Detention"
+                                className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                                style={{
+                                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)",
+                                }}
+                                onChange={(e) =>
+                                  setDateOfDetention(e.target.value)
+                                }
+                              />
+                              <Select
+                                isLoaded={isLoaded}
+                                onGeofenceEvent={handleGeofenceUpdate}
+                              />
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                variant="contained"
+                                style={{ backgroundColor: "#FF0000" }}
+                                className="flex justify-between items-center text-white rounded-xl p-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                                onClick={() => {
+                                  close();
+                                }}
+                              >
+                                Cancel
+                              </button>
+                              <button
+                                variant="contained"
+                                style={{ backgroundColor: "#FF0000" }}
+                                className="flex justify-between items-center text-white rounded-xl p-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                                onClick={() => {
+                                  console.log("Prisoner Deleted ");
+                                  handleSaveEdit(prisoner.deviceId);
+                                  close();
+                                }}
+                              >
+                                Save
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </Popup>
+                    </td>
+                  </tr>
+                }
+                modal
+                contentStyle={{
+                  borderRadius: "8px",
+                  padding: "10px",
+                  width: "500px",
+                }}
+              >
+                {(close) => (
+                  <div className="flex flex-col items-center w-full space-y-4">
+                    <div className="text-center border-b-2 border-b-black font-bold text-lg p-2 w-full">
+                      {prisoner.name}'Infos
+                    </div>
+                    <div className="text-center text-lg p-2 w-full">
+                      <p>
+                        <span className="font-bold">Name: </span>
+                        <span>{prisoner.name}</span>
+                      </p>
+                      <p>
+                        <span className="font-bold">DeviceId: </span>
+                        <span>{prisoner.deviceId}</span>
+                      </p>
+                      <p>
+                        <span className="font-bold">
+                          Date of Imprisonment:{" "}
+                        </span>
+                        <span>{prisoner.dateOfImprisonment}</span>
+                      </p>
+                      <GeofenceShow
+                        isLoaded={isLoaded}
+                      />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        variant="contained"
+                        style={{ backgroundColor: "#FF0000" }}
+                        className="flex justify-between items-center text-white rounded-xl p-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                        onClick={() => {
+                          close();
+                        }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   </div>
                 )}
-              </div>
-              <div className="flex flex-col lg:flex-row space-y-2 justify-between pt-4 my-2">
-                <button
-                  variant="contained"
-                  style={{ backgroundColor: "#FF0000" }}
-                  className="flex justify-between items-center text-white rounded-2xl px-2 py-1 md:px-3 md:py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
-                  onClick={() => handleDelete(prisoner.deviceId)}
-                >
-                  <CloseIcon />
-                </button>
-                <button
-                  onClick={() => handleaddloc(prisoner)}
-                  style={{ backgroundColor: "#05FF00" }}
-                  className="flex justify-between items-center text-white rounded-2xl px-2 py-1 md:px-3 md:py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
-                >
-                  add location
-                  <AddIcon />
-                </button>
-                <button
-                  variant="contained"
-                  style={{ backgroundColor: "#4A3AFF" }}
-                  className="flex justify-between items-center text-white rounded-2xl px-2 py-1 md:px-3 md:py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
-                  onClick={() => toggleEditVisible(index)}
-                  disabled={selectedPrisonerIndex === index}
-                >
-                  <EditIcon />
-                </button>
-              </div>
-            </div>
-          ))}
-        </Masonry>
-      </ResponsiveMasonry>
+              </Popup>
+            ))}
+          </tbody>
+        </table>
+      </div>
       {open && <Adduser handleClose={handleClose} />}
-      {openchange && (
-        <Changelocation
-          handleClose={handleclosechange}
-          handleSave={handleSaveGeofenceData}
-        />
-      )}
-      {openadd && (
-        <Addlocation handleClose={handlecloseadd} prisoner={selectedPrisoner} />
-      )}
     </div>
   );
 }

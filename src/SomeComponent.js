@@ -3,6 +3,7 @@ import { useSubscriptionContext } from "./Context/SubscriptionContext";
 
 function SomeComponent() {
   const { incomingData, loading, error } = useSubscriptionContext();
+  console.log(incomingData);
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -17,6 +18,6 @@ function SomeComponent() {
       )}
     </div>
   );
-} 
+}
 
 export default SomeComponent;

@@ -8,7 +8,7 @@ export const Select = (props) => {
   const [geofences, setGeofences] = useState([]);
   const drawingManagerRef = useRef(null);
   const containerStyle = {
-    width: "500px",
+    width: "100%",
     height: "500px",
   };
   const center = {
