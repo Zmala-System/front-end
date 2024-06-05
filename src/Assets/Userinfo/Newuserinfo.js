@@ -4,16 +4,22 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Check } from "@mui/icons-material";
 import AddFriendIcon from "@mui/icons-material/PersonAdd";
-import Usericon from "../../icons/User.svg";
 import "./Newuserinfo.css";
 import { useMutation } from "@apollo/client";
 import { CHANGE_ADMIN_PASSWORD } from "../../GraphQL/mutations";
-
-function Newuserinfo({ showAddFriendIcon, handleadduserclick }) {
+import "reactjs-popup/dist/index.css";
+import { CREATE_PRISONER_MUTATION } from "../../GraphQL/mutations";
+import Popup from "reactjs-popup";
+import { useJsApiLoader } from "@react-google-maps/api";
+import { Select } from "../../components/Map/Select";
+function Newuserinfo({ show }) {
+  const { isLoaded } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.React_APP_GOOGLE_MAPS_API_KEY,
+  });
   const [username, setUsername] = useState("");
   const [settingsdown, Setsettingsdown] = useState(false);
   const [notificationsdown, Setnotificationsdown] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   useEffect(() => {
@@ -24,6 +30,7 @@ function Newuserinfo({ showAddFriendIcon, handleadduserclick }) {
   }, []);
   const handlelogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("username");
     window.location.reload();
   };
   const [
@@ -41,16 +48,65 @@ function Newuserinfo({ showAddFriendIcon, handleadduserclick }) {
       const { data } = await changeAdminPassword({
         variables: { password, confirmPassword },
       });
-
-      // Handle success, e.g., display a success message
       console.log("Password changed successfully:", data.changeAdminPassword);
-
-      // Reset the password fields
-      // setPassword("");
-      // setConfirmPassword("");
+      setPassword("");
+      setConfirmPassword("");
     } catch (error) {
-      // Handle error, e.g., display an error message
       console.error("Error changing password:", error);
+    }
+  };
+  const [Data, setData] = useState();
+  const [Name, setName] = useState("");
+  const [DateOfBirth, setDateOfBirth] = useState("");
+  const [error, setError] = useState(""); // State for error message
+  const [BraceletId, setBraceletId] = useState("");
+  const [DateOfDetention, setDateOfDetention] = useState("");
+  const [PeriodOfDetention, setPeriodOfDetention] = useState("");
+  const [datafilled, setDatafilled] = useState(false);
+  const [createPrisoner] = useMutation(CREATE_PRISONER_MUTATION, {
+    context: {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    },
+  });
+
+  const handleGeofenceUpdate = (eventType, geofenceData) => {
+    setData(geofenceData);
+    console.log("Geofence update:", eventType, geofenceData);
+  };
+
+  const handleSave = async () => {
+    if (
+      Data === "" ||
+      Name === "" ||
+      DateOfBirth === "" ||
+      DateOfDetention === "" ||
+      PeriodOfDetention === ""
+    ) {
+      setDatafilled(true);
+    } else {
+      setDatafilled(false);
+      try {
+        const authorizedLocations = Data.map(({ lat, lng }) => ({
+          latitude: lat,
+          longitude: lng,
+        }));
+        await createPrisoner({
+          variables: {
+            prisonerInput: {
+              name: Name,
+              dateOfImprisonment: DateOfDetention,
+              authorizedLocations: [authorizedLocations],
+              deviceId: BraceletId,
+            },
+          },
+        });
+        window.location.reload();
+      } catch (error) {
+        setError(error.message);
+        console.error("Error creating prisoner:", error);
+      }
     }
   };
   return (
@@ -60,24 +116,107 @@ function Newuserinfo({ showAddFriendIcon, handleadduserclick }) {
           settingsdown || notificationsdown ? "rounded-t-2xl" : "rounded-2xl"
         } flex flex-row justify-center items-center space-x-2 p-2`}
       >
-        <div
-          onMouseEnter={() => setShowTooltip(true)}
-          onMouseLeave={() => setShowTooltip(false)}
-        >
-          {showAddFriendIcon && (
-            <div className="cursor-pointer">
-              <AddFriendIcon
-                style={{ fontSize: 20, color: "white" }}
-                onClick={handleadduserclick}
-              />
-              {showTooltip && (
-                <div className="absolute top-8 left-8 bg-black text-white px-2 py-1 rounded">
-                  Add prisoner
+        {show && (
+          <div>
+            {" "}
+            <Popup
+              trigger={
+                <button
+                  variant="contained"
+                  style={{ backgroundColor: "#FFFFFF" }}
+                  className="flex m-2 justify-between items-center min-w-[12rem] text-[#4A3AFF] rounded-xl px-1 py-1 md:px-3 md:py-2 font-semibold shadow-lg transition-transform transform-gpu hover:scale-105 hover:shadow-2xl "
+                >
+                  Add A Prisoner
+                  <AddFriendIcon />
+                </button>
+              }
+              className=""
+              modal
+              contentStyle={{
+                borderRadius: "8px",
+                padding: "10px",
+                width: "80%",
+              }}
+            >
+              {(close) => (
+                <div className="">
+                  <div className="flex flex-col text-center border-b-2 border-b-black font-bold text-lg p-2 w-full">
+                    Add Prisoner
+                  </div>
+                  <div className="bg-white p-8 rounded-xl flex w-full">
+                    <div className="flex flex-col space-y-8 pr-4 w-full ">
+                      <input
+                        placeholder="Name"
+                        value={Name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="rounded-2xl px-4 py-3 w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                      />
+                      <input
+                        placeholder="Date of birth"
+                        value={DateOfBirth}
+                        onChange={(e) => setDateOfBirth(e.target.value)}
+                        className="rounded-2xl px-4 py-3 w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                      />
+                      <input
+                        placeholder="Bracelet ID"
+                        value={BraceletId}
+                        onChange={(e) => setBraceletId(e.target.value)}
+                        className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                      />
+                      <input
+                        placeholder="Date of detention"
+                        value={DateOfDetention}
+                        onChange={(e) => setDateOfDetention(e.target.value)}
+                        className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                      />
+                      <input
+                        placeholder="Period of detention"
+                        value={PeriodOfDetention}
+                        onChange={(e) => setPeriodOfDetention(e.target.value)}
+                        className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
+                        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                      />
+                    </div>
+
+                    <div className="flex flex-col items-end px-4">
+                      <Select
+                        isLoaded={isLoaded}
+                        onGeofenceEvent={handleGeofenceUpdate}
+                      />
+                      {datafilled && (
+                        <p className="error-message">Please fill all fields</p>
+                      )}
+                      {error && <p className="error-message">{error}</p>}
+                    </div>
+                  </div>
+                  <div className="flex w-full items-center justify-center">
+                    <button
+                      variant="contained"
+                      style={{ backgroundColor: "#FF0000" }}
+                      onClick={close}
+                      className="flex justify-between items-center text-white rounded-xl px-3 py-2 font-bold shadow-2xl min-w-36 transition-transform transform-gpu hover:scale-105 hover:shadow-lg mr-4"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      style={{ backgroundColor: "#05FF00" }}
+                      className="flex justify-between items-center text-white rounded-xl px-3 py-2 font-bold shadow-2xl min-w-36 transition-transform transform-gpu hover:scale-105 hover:shadow-lg "
+                      onClick={handleSave}
+                    >
+                      Save
+                      <Check />
+                    </button>
+                  </div>
                 </div>
               )}
-            </div>
-          )}
-        </div>
+            </Popup>
+          </div>
+        )}
+
         <NotificationsIcon
           className="text-white cursor-pointer"
           onClick={() => {
@@ -92,15 +231,9 @@ function Newuserinfo({ showAddFriendIcon, handleadduserclick }) {
             Setsettingsdown(!settingsdown);
           }}
         />
-        <div className="flex flex-row bg-white justify-center items-center px-2  space-x-4 rounded-2xl">
-          <img
-            src={Usericon}
-            alt="User Icon"
-            style={{ width: "32px", height: "32px" }}
-          />
+        <div className="flex flex-row bg-white justify-center items-center px-4 py-2 space-x-4 rounded-xl">
           <div className="flex flex-col justify-center items-center">
-            <p>{username} </p>
-            <p>Administrator</p>
+            <p className="font-bold">{username} </p>
           </div>
           <LogoutIcon
             className="text-black cursor-pointer"
@@ -133,7 +266,7 @@ function Newuserinfo({ showAddFriendIcon, handleadduserclick }) {
             />
             <button
               style={{ backgroundColor: "#05FF00" }}
-              className="flex justify-between items-center text-white rounded-full px-4 py-2 font-bold shadow-2xl max-w-36 transition-transform transform-gpu hover:scale-105 hover:shadow-lg"
+              className="flex min-w-[7rem] justify-between items-center text-white rounded-xl px-4 py-2 font-bold shadow-2xl max-w-36 transition-transform transform-gpu hover:scale-105 hover:shadow-lg"
               onClick={() => {
                 handleSavePassword(password, confirmPassword);
                 Setsettingsdown(false);

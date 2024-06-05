@@ -1,6 +1,11 @@
-import { GoogleMap, DrawingManager, Polygon } from "@react-google-maps/api";
+import {
+  GoogleMap,
+  DrawingManager,
+  Polygon,
+  Autocomplete,
+} from "@react-google-maps/api";
 import { useState, useRef, useEffect } from "react";
-import mapstyles from './stylemap.json';
+import mapstyles from "./stylemap.json";
 
 export const Select = (props) => {
   const { isLoaded } = props;
@@ -8,13 +13,10 @@ export const Select = (props) => {
   const [geofences, setGeofences] = useState([]);
   const drawingManagerRef = useRef(null);
   const containerStyle = {
-    width: "100%",
+    width: "500px",
     height: "500px",
   };
-  const center = {
-    lat: 36.166667,
-    lng: 1.333333,
-  };
+  const [center, setCenter] = useState({});
 
   useEffect(() => {
     if (map) {
@@ -53,11 +55,49 @@ export const Select = (props) => {
     }
   }, [map]);
 
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCenter({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error(error);
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+    }
+  }, []);
+
   return (
     isLoaded && (
-      <>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          height: "100%",
+        }}
+      >
+        <Autocomplete>
+          <input
+            inputRef={center}
+            fullWidth
+            placeholder="Pickup Location"
+            className="text-field"
+            type="text"
+          />
+        </Autocomplete>
         <GoogleMap
-          mapContainerStyle={containerStyle}
+          mapContainerStyle={{
+            ...containerStyle,
+            borderRadius: "16px",
+          }}
           center={center}
           zoom={10}
           onLoad={(map) => setMap(map)}
@@ -70,16 +110,16 @@ export const Select = (props) => {
               key={index}
               paths={coordinates}
               options={{
-                fillColor: "#FF0000",
+                fillColor: "#FFFFFF",
                 fillOpacity: 0.35,
-                strokeColor: "#000000",
+                strokeColor: "#FFFFFF",
                 strokeOpacity: 0.8,
                 strokeWeight: 2,
               }}
             />
           ))}
         </GoogleMap>
-      </>
+      </div>
     )
   );
 };

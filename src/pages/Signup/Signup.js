@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import {
-  FacebookRounded,
-  Google,
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
@@ -96,8 +94,8 @@ function Signup() {
 
   return (
     <div className="w-full flex flex-row items-center relative signup">
-      <div className="w-1/2 bg-white flex justify-center items-center">
-        <div className="border border-gray-400 rounded-xl px-8 py-12 space-y-6 shadow-xl w-[clamp(200px,60%,400px)]">
+      <div className="w-1/2  flex justify-center items-center">
+        <div className="border bg-white border-gray-400 rounded-xl px-8 py-12 space-y-6 shadow-xl w-[clamp(200px,60%,400px)]">
           <h1 className="text-black text-2xl">Welcome!</h1>
           <div className="flex flex-col space-y-1">
             <p>Email</p>

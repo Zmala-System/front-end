@@ -1,3 +1,10 @@
+body {
+  background-image: url("./Curve\ Line.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .grid-container::-webkit-scrollbar {
   width: 10px;
 }
@@ -17,6 +24,9 @@
   font-family: "Fira Sans", sans-serif;
   font-weight: 400;
   font-style: normal;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
 }
 
 .table {
@@ -26,14 +36,14 @@
 }
 
 td:nth-child(1) {
-  width: 2px; /* Set width for the first column */
+  width: 2px;
 }
 
 td:nth-child(2) {
-  width: 20%; /* Set width for the second column as 30% of table width */
+  width: 20%;
 }
 td:nth-child(3) {
-  width: 40%; /* Set width for the second column as 30% of table width */
+  width: 70%;
 }
 
 td:first-child,
@@ -48,4 +58,31 @@ th:last-child {
 
 tr {
   border-bottom: 2px solid #cfd2cd;
+}
+
+.users .header {
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.users .content {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.table th,
+.table td {
+  text-align: left;
+}
+
+.table th {
+  background-color: #f8f8f8;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-radius: 0%;
+  border-bottom: 2px #cacaca;
 }

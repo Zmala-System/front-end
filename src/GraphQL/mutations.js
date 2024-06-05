@@ -4,6 +4,7 @@ export const LOGIN_MUTATION = gql`
   mutation LoginMutation($loginAdminInput: LoginAdminInput!) {
     loginAdmin(loginAdminInput: $loginAdminInput) {
       userId
+      username
       token
       tokenExpiration
     }

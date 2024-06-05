@@ -1,14 +1,10 @@
 import { gql } from "@apollo/client";
 
-export const SubscripeToTopic = gql`
-  subscription LocationChangedPrisoner($deviceId: String!) {
-    locationChangedPrisoner(deviceId: $deviceId) {
-      id
-      name
-    }
+export const LOCATION_CHANGED_PRISONER = gql`
+  subscription locationChangedPrisoner($deviceId: String!) {
+    locationChangedPrisoner(deviceId: $deviceId)
   }
 `;
-
 export const GET_ALL_PRISONERS_QUERY = gql`
   query GetPrisoners {
     getPrisoners {
@@ -24,6 +20,8 @@ export const GET_ALL_PRISONERS_QUERY = gql`
         latitude
         longitude
       }
+      battery
+      alerts
     }
   }
 `;

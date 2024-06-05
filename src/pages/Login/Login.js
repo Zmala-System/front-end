@@ -1,7 +1,5 @@
 import React, { useState } from "react";
 import {
-  FacebookRounded,
-  Google,
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
@@ -25,7 +23,13 @@ function Login() {
     },
     onCompleted: (data) => {
       const token = data?.loginAdmin?.token;
+      console.log(data?.loginAdmin?.username);
       const username = data?.loginAdmin?.username;
+      if (username){
+        localStorage.setItem("username",username);
+      }else{
+        console.log("login successful but no username received");
+      }
       if (token) {
         localStorage.setItem("token", token);
         window.location.href = "/";
@@ -85,14 +89,13 @@ function Login() {
           </p>
         </div>
       </div>
-
       <div className="flex relative justify-center items-center h-screen">
         <div className=" absolute text-gradient text-9xl font-bold -rotate-90 tracking-widest">
           LOGIN
         </div>
       </div>
-      <div className="w-1/2 bg-white flex justify-center items-center">
-        <div className="border border-gray-400 rounded-xl px-8 py-12 space-y-6 shadow-xl w-2/5">
+      <div className="w-1/2  flex justify-center items-center">
+        <div className="border bg-white border-gray-400 rounded-xl px-8 py-12 space-y-6 shadow-xl w-2/5">
           <h1 className="text-black text-2xl">Welcome!</h1>
           <div className="flex flex-col space-y-1">
             <p>Email</p>
