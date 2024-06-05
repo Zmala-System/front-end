@@ -116,9 +116,6 @@ function Newuserinfo({ show }) {
           settingsdown || notificationsdown ? "rounded-t-2xl" : "rounded-2xl"
         } flex flex-row justify-center items-center space-x-2 p-2`}
       >
-        {show && (
-          <div>
-            {" "}
             <Popup
               trigger={
                 <button
@@ -135,7 +132,7 @@ function Newuserinfo({ show }) {
               contentStyle={{
                 borderRadius: "8px",
                 padding: "10px",
-                width: "80%",
+                width: "50%",
               }}
             >
               {(close) => (
@@ -149,36 +146,78 @@ function Newuserinfo({ show }) {
                         placeholder="Name"
                         value={Name}
                         onChange={(e) => setName(e.target.value)}
-                        className="rounded-2xl px-4 py-3 w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                        style={{
+                          width: "360px",
+                          padding: "10px",
+                          margin: "10px 0",
+                          borderRadius: "16px",
+                          border: "1px solid #ccc",
+                          boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+                          fontSize: "16px",
+                          outline: "none",
+                        }}
                       />
                       <input
                         placeholder="Date of birth"
+                        type="Date"
                         value={DateOfBirth}
                         onChange={(e) => setDateOfBirth(e.target.value)}
-                        className="rounded-2xl px-4 py-3 w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                        style={{
+                          width: "360px",
+                          padding: "10px",
+                          margin: "10px 0",
+                          borderRadius: "16px",
+                          border: "1px solid #ccc",
+                          boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+                          fontSize: "16px",
+                          outline: "none",
+                        }}
                       />
                       <input
                         placeholder="Bracelet ID"
                         value={BraceletId}
                         onChange={(e) => setBraceletId(e.target.value)}
-                        className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                        style={{
+                          width: "360px",
+                          padding: "10px",
+                          margin: "10px 0",
+                          borderRadius: "16px",
+                          border: "1px solid #ccc",
+                          boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+                          fontSize: "16px",
+                          outline: "none",
+                        }}
                       />
                       <input
                         placeholder="Date of detention"
+                        type="Date"
                         value={DateOfDetention}
                         onChange={(e) => setDateOfDetention(e.target.value)}
-                        className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                        style={{
+                          width: "360px",
+                          padding: "10px",
+                          margin: "10px 0",
+                          borderRadius: "16px",
+                          border: "1px solid #ccc",
+                          boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+                          fontSize: "16px",
+                          outline: "none",
+                        }}
                       />
                       <input
                         placeholder="Period of detention"
                         value={PeriodOfDetention}
                         onChange={(e) => setPeriodOfDetention(e.target.value)}
-                        className="rounded-2xl px-4 py-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                        style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+                        style={{
+                          width: "360px",
+                          padding: "10px",
+                          margin: "10px 0",
+                          borderRadius: "16px",
+                          border: "1px solid #ccc",
+                          boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+                          fontSize: "16px",
+                          outline: "none",
+                        }}
                       />
                     </div>
 
@@ -214,8 +253,8 @@ function Newuserinfo({ show }) {
                 </div>
               )}
             </Popup>
-          </div>
-        )}
+
+
 
         <NotificationsIcon
           className="text-white cursor-pointer"
@@ -251,16 +290,32 @@ function Newuserinfo({ show }) {
             <input
               type="password"
               placeholder="Enter your password"
-              className="rounded-2xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-              style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+              style={{
+                width: "350px",
+                padding: "10px",
+                margin: "10px 0",
+                borderRadius: "16px",
+                border: "1px solid #ccc",
+                boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+                fontSize: "16px",
+                outline: "none",
+              }}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
             <input
               type="password"
               placeholder="Confirm your password"
-              className="rounded-2xl px-4 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-              style={{ boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)" }}
+              style={{
+                width: "350px",
+                padding: "10px",
+                margin: "10px 0",
+                borderRadius: "16px",
+                border: "1px solid #ccc",
+                boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+                fontSize: "16px",
+                outline: "none",
+              }}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />

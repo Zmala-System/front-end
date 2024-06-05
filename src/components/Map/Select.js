@@ -11,12 +11,13 @@ export const Select = (props) => {
   const { isLoaded } = props;
   const [map, setMap] = useState(null);
   const [geofences, setGeofences] = useState([]);
+  const [center, setCenter] = useState({});
+  const autocompleteRef = useRef(null);
   const drawingManagerRef = useRef(null);
   const containerStyle = {
     width: "500px",
     height: "500px",
   };
-  const [center, setCenter] = useState({});
 
   useEffect(() => {
     if (map) {
@@ -60,8 +61,8 @@ export const Select = (props) => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setCenter({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
+            lat: 35.20977039999999,
+            lng: -0.6331753,
           });
         },
         (error) => {
@@ -73,24 +74,51 @@ export const Select = (props) => {
     }
   }, []);
 
+  const handlePlaceChanged = () => {
+    if (autocompleteRef.current) {
+      const place = autocompleteRef.current.getPlace();
+      if (place.geometry && place.geometry.location) {
+        const location = place.geometry.location;
+        console.log("Selected Place Location:", {
+          lat: location.lat(),
+          lng: location.lng(),
+        });
+        setCenter({
+          lat: location.lat(),
+          lng: location.lng(),
+        });
+      }
+    }
+  };
+
   return (
     isLoaded && (
       <div
         style={{
           display: "flex",
-          justifyContent: "center",
+          flexDirection: "column",
           alignItems: "center",
           width: "100%",
           height: "100%",
         }}
       >
-        <Autocomplete>
+        <Autocomplete
+          onLoad={(autocomplete) => (autocompleteRef.current = autocomplete)}
+          onPlaceChanged={handlePlaceChanged}
+        >
           <input
-            inputRef={center}
-            fullWidth
             placeholder="Pickup Location"
-            className="text-field"
             type="text"
+            style={{
+              width: "300px",
+              padding: "10px",
+              margin: "10px 0",
+              borderRadius: "16px",
+              border: "1px solid #ccc",
+              boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+              fontSize: "16px",
+              outline: "none",
+            }}
           />
         </Autocomplete>
         <GoogleMap
@@ -99,7 +127,7 @@ export const Select = (props) => {
             borderRadius: "16px",
           }}
           center={center}
-          zoom={10}
+          zoom={18}
           onLoad={(map) => setMap(map)}
           options={{
             styles: mapstyles,

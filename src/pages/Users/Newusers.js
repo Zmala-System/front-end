@@ -299,7 +299,7 @@ function Newusers() {
                         contentStyle={{
                           borderRadius: "8px",
                           padding: "10px",
-                          width: "500px",
+                          width: "900px",
                         }}
                       >
                         {(close) => (
@@ -307,33 +307,54 @@ function Newusers() {
                             <div className="text-center border-b-2 border-b-black font-bold text-lg p-2 w-full">
                               Edit Prisoner
                             </div>
-                            <div className="text-center text-lg p-2 flex flex-col items-center w-full space-y-4">
-                              <input
-                                placeholder="Name"
-                                className="rounded-2xl px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                                style={{
-                                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)",
-                                }}
-                                onChange={(e) => setName(e.target.value)}
-                              />
-                              <input
-                                placeholder="Device ID"
-                                className="rounded-2xl px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                                style={{
-                                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)",
-                                }}
-                                onChange={(e) => setDeviceID(e.target.value)}
-                              />
-                              <input
-                                placeholder="Date of Detention"
-                                className="rounded-2xl px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 shadow-xl"
-                                style={{
-                                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.4)",
-                                }}
-                                onChange={(e) =>
-                                  setDateOfDetention(e.target.value)
-                                }
-                              />
+                            <div className="flex w-full justify-between h-full">
+                              <div className="text-center h-full text-lg p-2 flex flex-col items-end w-full space-y-4">
+                                <input
+                                  placeholder="Name"
+                                  style={{
+                                    width: "360px",
+                                    padding: "10px",
+                                    margin: "10px 0",
+                                    borderRadius: "16px",
+                                    border: "1px solid #ccc",
+                                    boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+                                    fontSize: "16px",
+                                    outline: "none",
+                                  }}
+                                  onChange={(e) => setName(e.target.value)}
+                                />
+                                <input
+                                  placeholder="Device ID"
+                                  style={{
+                                    width: "360px",
+                                    padding: "10px",
+                                    margin: "10px 0",
+                                    borderRadius: "16px",
+                                    border: "1px solid #ccc",
+                                    boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+                                    fontSize: "16px",
+                                    outline: "none",
+                                  }}
+                                  onChange={(e) => setDeviceID(e.target.value)}
+                                />
+                                <input
+                                  placeholder="Date of Detention"
+                                  type="Date"
+                                  style={{
+                                    width: "360px",
+                                    padding: "10px",
+                                    margin: "10px 0",
+                                    borderRadius: "16px",
+                                    border: "1px solid #ccc",
+                                    boxShadow: "0 1px 6px rgba(0, 0, 0, 0.1)",
+                                    fontSize: "16px",
+                                    outline: "none",
+                                  }}
+                                  onChange={(e) =>
+                                    setDateOfDetention(e.target.value)
+                                  }
+                                />
+                              </div>
                               <Select
                                 isLoaded={isLoaded}
                                 onGeofenceEvent={handleGeofenceUpdate}
@@ -491,20 +512,24 @@ function Newusers() {
                           </span>
                         </p>
                         <p className="font-bold">Latest Alerts:</p>
-                        {prisoner.alerts && prisoner.alerts.length > 0 ? (
-                          <ul>
-                            {prisoner.alerts.map((alert, idx) => (
-                              <li key={idx} className="mt-2">
-                                {alert}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <>
-                          {console.log("alerts",prisoner.alerts)}
-                          <p>No alerts available</p>
-                          </>
-                        )}
+                        <div className="overflow-y-auto max-h-40 grid-container">
+                          {prisoner.alerts && prisoner.alerts.length > 0 ? (
+                            <ul className="list-none">
+                              {prisoner.alerts.map((alert, idx) => (
+                                <li
+                                  key={idx}
+                                  className="mt-2 p-1 bg-[#FF0000] border rounded-md"
+                                >
+                                  {alert}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p className="italic text-gray-500">
+                              No alerts available
+                            </p>
+                          )}
+                        </div>
                       </div>
                       {sid === prisoner.deviceId ? (
                         <Userinfos

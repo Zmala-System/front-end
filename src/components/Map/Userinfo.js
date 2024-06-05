@@ -1,12 +1,9 @@
 import React, { useEffect } from "react";
 import mapstyles from "./stylemap.json";
+import greenMarkerIcon from "../../icons/markerlatest.png"; // Use an import statement for the image
 
 const Userinfos = ({ latitude, longitude, autplace, past }) => {
   useEffect(() => {
-    const greenMarkerIcon = {
-      url: require("../../icons/markerlatest.png"),
-      scaledSize: new window.google.maps.Size(40, 40),
-    };
     const mapOptions = {
       zoom: 10,
       styles: mapstyles,
@@ -23,8 +20,8 @@ const Userinfos = ({ latitude, longitude, autplace, past }) => {
           ...mapOptions,
           center: center,
         });
-        console.log("past", past);
-        const markers = [];
+
+        const markers = past || [];
 
         markers.forEach((markerData) => {
           new window.google.maps.Marker({
@@ -35,18 +32,18 @@ const Userinfos = ({ latitude, longitude, autplace, past }) => {
         });
 
         let polygonCoords = [];
-        console.log(autplace);
         if (autplace && autplace.length > 0) {
           polygonCoords = autplace[0].map((location) => ({
             lat: location.latitude,
             lng: location.longitude,
           }));
         }
-        console.log("cords: ", polygonCoords);
-        polygonCoords.push(polygonCoords[0]);
-        console.log("cords: ", polygonCoords);
 
-        // Calculate the average latitude and longitude
+        // Close the polygon by adding the first coordinate to the end
+        if (polygonCoords.length > 0) {
+          polygonCoords.push(polygonCoords[0]);
+        }
+
         const avgLat =
           polygonCoords.reduce((sum, coord) => sum + coord.lat, 0) /
           polygonCoords.length;
@@ -64,23 +61,26 @@ const Userinfos = ({ latitude, longitude, autplace, past }) => {
         });
 
         polygon.setMap(map);
-        if (
-          parseFloat(latitude) != latitude &&
-          parseFloat(longitude) != longitude
-        ) {
+
+        // Check if latitude and longitude are valid numbers
+        if (!isNaN(parseFloat(latitude)) && !isNaN(parseFloat(longitude))) {
           new window.google.maps.Marker({
             position: { lat: parseFloat(latitude), lng: parseFloat(longitude) },
             map: map,
             title: "Marker",
-            icon: greenMarkerIcon,
+            icon: {
+              url: greenMarkerIcon,
+              scaledSize: new window.google.maps.Size(40, 40),
+            },
           });
         }
+
         map.setCenter({ lat: avgLat, lng: avgLng });
       });
     } else {
       console.error("Geolocation is not supported by this browser.");
     }
-  }, []);
+  }, [latitude, longitude, autplace, past]);
 
   return (
     <div
