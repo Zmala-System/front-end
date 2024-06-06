@@ -5,7 +5,7 @@ import greenMarkerIcon from "../../icons/markerlatest.png"; // Use an import sta
 const Userinfos = ({ latitude, longitude, autplace, past }) => {
   useEffect(() => {
     const mapOptions = {
-      zoom: 10,
+      zoom: 18,
       styles: mapstyles,
     };
 
