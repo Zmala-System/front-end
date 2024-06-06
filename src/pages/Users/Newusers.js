@@ -21,28 +21,35 @@ import Userinfos from "../../components/Map/Userinfo";
 
 function Newusers() {
   const PrisonerLocation = ({ deviceId }) => {
-    const { incomingData, dId, setdId } = useSubscriptionContext();
-    let prisonerId, prisonerName, latitude, longitude, battery, alert1, alert2;
-    setdId(deviceId);
-    console.log(dId);
-    console.log(incomingData);
-    if (!incomingData || !dId) {
+    const { incomingData } = useSubscriptionContext();
+    const [latData, setlatData] = useState(null);
+    const [lngdata,selngdata]=useState(null);
+    const [battdata,setbattdata]=useState(null);
+
+    useEffect(() => {
+      if (incomingData) {
+        const [prisonerId, prisonerName, lat, lon, battery, alert1, alert2] =
+          incomingData.split("/");
+        if (prisonerId === deviceId) {
+          setsid(prisonerId);
+          setlatData(lat);
+          //console.log(latData);
+          setbattdata(battery);
+          console.log(battdata);
+          selngdata(lon);
+          //console.log(lngdata);
+        }
+      }
+    }, [incomingData, deviceId]);
+
+    if (!battdata) {
       return <p>Battery Level not Available</p>;
     }
-    if (incomingData && incomingData.locationChangedPrisoner) {
-      [prisonerId, prisonerName, latitude, longitude, battery, alert1, alert2] =
-        incomingData.locationChangedPrisoner.split("/");
-      if (prisonerId === dId) {
-        setLatitude(latitude);
-        setLongitude(longitude);
-        setsid(dId);
-        console.log(latitude);
-        console.log(longitude);
-        return <div>{battery}%</div>;
-      } else {
-        return <div>Battery Level Not Avaialbe</div>;
-      }
-    }
+    console.log("lat",latData);
+    setLongitude(lngdata);
+    setLatitude(latData);
+    console.log("long",lngdata);
+    return <div>{battdata}%</div>;
   };
   const [sid, setsid] = useState(null);
   const [getAllPrisoners, { loading, error, data }] = useLazyQuery(
@@ -232,7 +239,6 @@ function Newusers() {
       </div>
     );
   }
-  console.log(sprisoners);
 
   return (
     <div className="rounded-lg flex flex-col p-4 users ">

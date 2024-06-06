@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const LOCATION_CHANGED_PRISONER = gql`
-  subscription locationChangedPrisoner($deviceId: String!) {
-    locationChangedPrisoner(deviceId: $deviceId)
+  subscription locationChangedPrisoner {
+    locationChangedPrisoner
   }
 `;
 export const GET_ALL_PRISONERS_QUERY = gql`

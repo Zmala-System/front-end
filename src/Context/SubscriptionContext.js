@@ -10,20 +10,16 @@ export const useSubscriptionContext = () => {
 
 export const SubscriptionProvider = ({ children }) => {
   const [incomingData, setIncomingData] = useState(null);
-  const [dId, setdId] = useState(null);
+
   useSubscription(LOCATION_CHANGED_PRISONER, {
-    variables: { deviceId: dId },
     onSubscriptionData: ({ subscriptionData }) => {
       const { data } = subscriptionData;
-      console.log(data);
-      setIncomingData(data);
+      setIncomingData(data.locationChangedPrisoner);
     },
   });
 
   const contextValue = {
     incomingData,
-    dId,
-    setdId,
   };
 
   return (

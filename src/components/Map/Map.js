@@ -1,15 +1,55 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import mapstyles from "./stylemap.json";
+import { useSubscriptionContext } from "../../Context/SubscriptionContext";
 
 const Maps = () => {
+  const { incomingData } = useSubscriptionContext();
+  const [markers, setMarkers] = useState([]);
+  const [map, setMap] = useState(null);
+  const [infoWindow, setInfoWindow] = useState(null);
+
+  useEffect(() => {
+    if (incomingData) {
+      const [prisonerId, prisonerName, lat, lon, battery, alert1, alert2] =
+        incomingData.split("/");
+      const latitude = parseFloat(lat);
+      const longitude = parseFloat(lon);
+
+      setMarkers((prevMarkers) => {
+        const existingMarkerIndex = prevMarkers.findIndex(
+          (marker) => marker.id === prisonerId
+        );
+
+        if (existingMarkerIndex !== -1) {
+          const existingMarker = prevMarkers[existingMarkerIndex];
+          if (
+            existingMarker.lat !== latitude ||
+            existingMarker.lon !== longitude
+          ) {
+            const updatedMarkers = [...prevMarkers];
+            updatedMarkers[existingMarkerIndex] = {
+              ...existingMarker,
+              lat: latitude,
+              lon: longitude,
+            };
+            return updatedMarkers;
+          }
+          return prevMarkers;
+        }
+
+        return [
+          ...prevMarkers,
+          { id: prisonerId, name: prisonerName, lat: latitude, lon: longitude },
+        ];
+      });
+    }
+  }, [incomingData]);
+
   useEffect(() => {
     const mapOptions = {
       zoom: 10,
       styles: mapstyles,
     };
-
-    let map;
-    let autocomplete;
 
     const initializeMap = (position) => {
       const center = {
@@ -17,13 +57,17 @@ const Maps = () => {
         lng: position.coords.longitude,
       };
 
-      map = new window.google.maps.Map(document.getElementById("map"), {
-        ...mapOptions,
-        center: center,
-      });
+      const mapInstance = new window.google.maps.Map(
+        document.getElementById("map"),
+        {
+          ...mapOptions,
+          center: center,
+        }
+      );
+
       const input = document.getElementById("autocomplete-input");
-      autocomplete = new window.google.maps.places.Autocomplete(input);
-      autocomplete.bindTo("bounds", map);
+      const autocomplete = new window.google.maps.places.Autocomplete(input);
+      autocomplete.bindTo("bounds", mapInstance);
 
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
@@ -31,67 +75,17 @@ const Maps = () => {
           console.log("No details available for input: '" + place.name + "'");
           return;
         }
-        map.setCenter(place.geometry.location);
-        map.setZoom(15);
+        mapInstance.setCenter(place.geometry.location);
+        mapInstance.setZoom(15);
         new window.google.maps.Marker({
           position: place.geometry.location,
-          map: map,
+          map: mapInstance,
           title: place.name,
         });
       });
 
-      const markers = [
-        {
-          name: "location-2",
-          status: "l7oman",
-          location: {
-            lat: 36.1581,
-            lng: 1.3372,
-          },
-        },
-        {
-          name: "location-3",
-          status: "l7oman",
-          location: {
-            lat: 35.2167,
-            lng: -0.647565,
-          },
-        },
-        {
-          name: "location-4",
-          status: "l7oman",
-          location: {
-            lat: 41.11373,
-            lng: 8.415038,
-          },
-        },
-      ];
-
-      markers.forEach((markerData) => {
-        new window.google.maps.Marker({
-          position: markerData.location,
-          map: map,
-          title: markerData.name,
-        });
-      });
-
-      const polygonCoords = [
-        { lat: 36.166667, lng: 1.333333 },
-        { lat: 36.1581, lng: 1.3372 },
-        { lat: 35.2167, lng: -0.647565 },
-        { lat: 41.11373, lng: 8.415038 },
-      ];
-
-      const polygon = new window.google.maps.Polygon({
-        paths: polygonCoords,
-        strokeColor: "#FFFFFF",
-        strokeOpacity: 0.8,
-        strokeWeight: 2,
-        fillColor: "#FFFFFF",
-        fillOpacity: 0.35,
-      });
-
-      polygon.setMap(map);
+      setMap(mapInstance);
+      setInfoWindow(new window.google.maps.InfoWindow());
     };
 
     if (navigator.geolocation) {
@@ -100,6 +94,28 @@ const Maps = () => {
       console.error("Geolocation is not supported by this browser.");
     }
   }, []);
+
+  useEffect(() => {
+    if (map && infoWindow) {
+      markers.forEach((markerData) => {
+        const marker = new window.google.maps.Marker({
+          position: { lat: markerData.lat, lng: markerData.lon },
+          map: map,
+          title: markerData.name,
+        });
+
+        marker.addListener("click", () => {
+          infoWindow.setContent(`
+          <div style="font-family: Arial, sans-serif; padding: 10px; line-height: 1.6;">
+          <p style="font-size: 16px; font-weight: bold;"><strong>ID:</strong> ${markerData.id}</p>
+          <p style="font-size: 16px; font-weight: bold;"><strong>Name:</strong> ${markerData.name}</p>
+        </div>
+          `);
+          infoWindow.open(map, marker);
+        });
+      });
+    }
+  }, [markers, map, infoWindow]);
 
   return (
     <div
